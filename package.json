@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "an api for transactional emails",
   "main": "app.js",
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "^8.0.0",
+    "express": "^4.17.0"
+  },
   "devDependencies": {
     "expect": "^24.8.0",
     "mocha": "^6.1.4",
