@@ -1,0 +1,27 @@
+{
+  "name": "email",
+  "version": "1.0.0",
+  "description": "an api for transactional emails",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "expect": "^24.8.0",
+    "mocha": "^6.1.4",
+    "supertest": "^4.0.2"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha -t 5000 tests/**/*.test.js",
+    "test-watch": "nodemon --exec \"npm test\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aaronshivers/email.git"
+  },
+  "author": "aaron shivers",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aaronshivers/email/issues"
+  },
+  "homepage": "https://github.com/aaronshivers/email#readme"
+}
