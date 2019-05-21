@@ -8,7 +8,11 @@ const { PORT } = process.env || 3000
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
+// GET /
+app.get('/', (req, res) => res.send('howdy'))
+
+// POST /
+app.post('/', (req, res) => {
 
   // get email address and message from body
   const { email, message } = req.body
