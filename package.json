@@ -5,7 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "dotenv": "^8.0.0",
-    "express": "^4.17.0"
+    "express": "^4.17.0",
+    "postmark": "^2.2.5"
   },
   "devDependencies": {
     "expect": "^24.8.0",
