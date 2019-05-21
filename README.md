@@ -12,7 +12,7 @@ touch .env
 3. Add environment variables to .env
   * PORT=8080
   * HOST=0.0.0.0
-  * POSTMARK_TOKEN=<your token here>
+  * POSTMARK_TOKEN=yourtokenhere
 
 4. Build application
 ```
