@@ -4,7 +4,7 @@ const express = require('express')
 const sendErrorEmail = require('./emails/error')
 
 const app = express()
-const { PORT } = process.env || 3000
+const { PORT, HOST } = process.env
 
 app.use(express.json())
 
@@ -25,6 +25,7 @@ app.post('/', (req, res) => {
   res.send({ email, message })
 })
 
-app.listen(PORT, () => console.log(`Server listening on port ${ PORT }.`))
+app.listen(PORT, HOST)
+console.log(`Running on http://${ HOST }:${ PORT }`)
 
 module.exports = app
