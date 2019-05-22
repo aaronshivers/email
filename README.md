@@ -31,8 +31,5 @@ curl -i localhost:49160
 
 7. Post to /
 ```
-{
-  "email": "youremail@server.com",
-  "message": "message body"
-}
+curl -d '{"email":"myemail@someserver.com", "message":"this is a test"}' -H "Content-Type: application/json" -X POST http://localhost:49160/
 ```
