@@ -3,10 +3,14 @@ require('dotenv').config()
 const express = require('express')
 const sendErrorEmail = require('./emails/error')
 
+const userRoutes = require('./routes/users')
+
 const app = express()
 const { PORT, HOST } = process.env
 
 app.use(express.json())
+
+app.use(userRoutes)
 
 // GET /
 app.get('/', (req, res) => res.send('howdy'))
