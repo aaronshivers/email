@@ -74,7 +74,9 @@ router.delete('/users', (req, res) => {
     res.send(foundUser)
 
   } catch (error) {
-    throw new Error (error)
+    
+    // send error message
+    res.send(error.message)
   }
 })
 
