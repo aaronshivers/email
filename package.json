@@ -20,7 +20,10 @@
     "test-watch": "nodemon --exec \"npm test\""
   },
   "nodemonConfig": {
-    "ignore": ["data/test-data.json", "data/users-data.json"]
+    "ignore": [
+      "data/test-data.json",
+      "data/users-data.json"
+    ]
   },
   "repository": {
     "type": "git",

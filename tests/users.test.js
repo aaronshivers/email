@@ -1,5 +1,6 @@
 const request = require('supertest')
 const expect = require('expect')
+const fs = require('fs')
 
 const app = require('../app')
 const users = require('../middleware/users')
@@ -10,6 +11,13 @@ describe('/users', () => {
   beforeEach(() => {
 
     const user = { email: 'hank.hill@stricklandlp.com', name: 'Hank Hill'}
+
+    // create the data directory, if needed
+    if (!fs.existsSync('./data')) {
+      fs.mkdir('./data', { recursive: true }, (err) => {
+        if (err) throw err
+      })
+    }
 
     users.removeAll()
     users.createUser(user)
