@@ -43,7 +43,7 @@ router.get('/users', (req, res) => {
   try {
 
     // get all users
-    const userList = users.getAllUsers()
+    const userList = users.getUsers()
 
     // return user list
     res.send(userList)
@@ -52,6 +52,29 @@ router.get('/users', (req, res) => {
 
     // send error message
     res.send(error.message)
+  }
+})
+
+// DELETE /users
+router.delete('/users', (req, res) => {
+
+  try {
+    
+    // get user email from body
+    const { email, name } = req.body
+
+    // verify that user is in the user list
+    const foundUser = users.getUser(email)
+    if (!foundUser) return res.send('User Not Found')
+
+    // delete the user
+    users.removeUser(email)
+
+    // return deleted user
+    res.send(foundUser)
+
+  } catch (error) {
+    throw new Error (error)
   }
 })
 

@@ -22,8 +22,6 @@ const saveUsers = users => {
 
 const removeAll = () => saveUsers([])
 
-const getAllUsers = () => getUsers()
-
 const createUser = user => {
   const users = getUsers()
 
@@ -39,13 +37,13 @@ const createUser = user => {
 }
 
 
-// const removeUser = user => {
-//   const users = getUsers()
-//   const filteredUsers = users.filter(curUser => curUser !== user)
-//   saveUsers(filteredUsers)
+const removeUser = email => {
+  const users = getUsers()
+  const filteredUsers = users.filter(currentUser => currentUser.email !== email)
+  saveUsers(filteredUsers)
 
-//   return users.length !== filteredUsers.length
-// }
+  return users.length !== filteredUsers.length
+}
 
 // get user by email
 const getUser = email => {
@@ -62,8 +60,8 @@ const getUser = email => {
 module.exports = {
   removeAll,
   createUser,
-  getAllUsers,
-  getUser
-  // removeUser,
+  getUsers,
+  getUser,
+  removeUser
   // logUser
 }

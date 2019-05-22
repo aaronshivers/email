@@ -8,9 +8,12 @@ const users = require('../middleware/users')
 
 describe('/users', () => {
 
-  beforeEach(() => {
+  const usersList = [
+    { email: 'hank.hill@stricklandlp.com', name: 'Hank Hill'},
+    { email: 'peggy.hill@tlhs.edu', name: 'Peggy Hill'}
+  ]
 
-    const user = { email: 'hank.hill@stricklandlp.com', name: 'Hank Hill'}
+  beforeEach(() => {
 
     // create the data directory, if needed
     if (!fs.existsSync('./data')) {
@@ -20,7 +23,8 @@ describe('/users', () => {
     }
 
     users.removeAll()
-    users.createUser(user)
+    users.createUser(usersList[0])
+    users.createUser(usersList[1])
   })
 
   describe('POST /users', () => {
@@ -57,7 +61,7 @@ describe('/users', () => {
 
     it('should respond 201, and create user', async () => {
 
-      const user = { email: 'peggy.hill@tlhs.edu', name: 'Peggy Hill'}
+      const user = { email: 'bobby.hill@tlhs.edu', name: 'Bobby Hill'}
 
       await request(app)
         .post('/users')
@@ -78,8 +82,28 @@ describe('/users', () => {
         .get('/users')
         .expect(200)
         .expect(res => {
-          expect(res.body.length).toBe(1)
+          expect(res.body.length).toBe(2)
         })
+    })
+  })
+
+  describe('DELETE /users', () => {
+
+    it('should respond 200, and delete the specified user', async () => {
+
+      const user = usersList[1]
+
+      await request(app)
+        .delete('/users')
+        .send(user)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.email).toContain(user.email)
+          expect(res.body.name).toContain(user.name)
+        })
+
+      const allUsers = users.getUsers()
+      expect(allUsers.length).toBe(1)
     })
   })
 })
