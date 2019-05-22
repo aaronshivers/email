@@ -70,13 +70,16 @@ describe('/users', () => {
     })
   })
 
-  // describe('GET /users', () => {
+  describe('GET /users', () => {
     
-  //   it('should respond 200', async () => {
+    it('should respond 200, and return user list', async () => {
     
-  //     await request(app)
-  //       .get('/users')
-  //       .expect(200)
-  //   })
-  // })
+      await request(app)
+        .get('/users')
+        .expect(200)
+        .expect(res => {
+          expect(res.body.length).toBe(1)
+        })
+    })
+  })
 })
