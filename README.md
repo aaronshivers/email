@@ -33,3 +33,11 @@ curl -i localhost:49160
 ```
 curl -d '{"email":"myemail@someserver.com", "message":"this is a test"}' -H "Content-Type: application/json" -X POST http://localhost:49160/
 ```
+
+## Usage Instructions
+
+### Users Routes
+1. POST /users
+2. GET /users
+3. PUT /users:id
+4. DELETE /users:id
