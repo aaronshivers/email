@@ -2,9 +2,10 @@ const express = require('express')
 const router = express.Router()
 const uuidv4 = require('uuid/v4')
 
+const { sendWelcomeEmail, sendGoodbyeEmail } = require('../emails/account')
+
 const validate = require('../middleware/validate')
 const userValidator = require('../middleware/userValidator')
-
 const users = require('../middleware/users')
 
 // POST /users
@@ -66,9 +67,6 @@ router.delete('/users/:id', (req, res) => {
 
     // get user id from params
     const { id } = req.params
-    
-    // get user email from body
-    const { email, name } = req.body
 
     // verify that user is in the user list
     const foundUser = users.getUserById(id)
@@ -79,7 +77,7 @@ router.delete('/users/:id', (req, res) => {
 
     // send goodby email
     if (process.env.NODE_ENV !== 'test') {
-      sendGoodbyeEmail(email, name)
+      sendGoodbyeEmail(foundUser.email, foundUser.name)
     }
 
     // return deleted user

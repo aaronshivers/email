@@ -1,5 +1,12 @@
 const fs = require('fs')
 
+// create the data directory, if needed
+if (!fs.existsSync('./data')) {
+  fs.mkdir('./data', { recursive: true }, (err) => {
+    if (err) throw err
+  })
+}
+
 // get NODE_ENV from process.env
 const { NODE_ENV } = process.env
 

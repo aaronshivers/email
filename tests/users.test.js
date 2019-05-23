@@ -16,13 +16,6 @@ describe('/users', () => {
 
   beforeEach(() => {
 
-    // create the data directory, if needed
-    if (!fs.existsSync('./data')) {
-      fs.mkdir('./data', { recursive: true }, (err) => {
-        if (err) throw err
-      })
-    }
-
     users.removeAll()
     users.createUser(usersList[0])
     users.createUser(usersList[1])
