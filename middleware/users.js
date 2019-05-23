@@ -25,9 +25,7 @@ const removeAll = () => saveUsers([])
 const createUser = user => {
   const users = getUsers()
 
-  const duplicateUsers = users.filter(currentUser => {
-    return currentUser.email === user.email
-  })
+  const duplicateUsers = users.filter(currentUser => currentUser.email === user.email)
 
   if (duplicateUsers.length === 0) {
     users.push(user)
@@ -37,31 +35,34 @@ const createUser = user => {
 }
 
 
-const removeUser = email => {
+const removeUser = id => {
   const users = getUsers()
-  const filteredUsers = users.filter(currentUser => currentUser.email !== email)
+  const filteredUsers = users.filter(currentUser => currentUser.id !== id)
   saveUsers(filteredUsers)
 
   return users.length !== filteredUsers.length
 }
 
-// get user by email
-const getUser = email => {
+// get user
+const getUserByEmail = email => {
   const users = getUsers()
   const filteredUsers = users.filter(currentUser => currentUser.email === email)
   return filteredUsers[0]
 }
 
-// const logUser = user => {
-//   console.log('')
-//   console.log(`User: ${ user }`)
-// }
+// get user by id
+const getUserById = id => {
+  const users = getUsers()
+  const filteredUsers = users.filter(currentUser => currentUser.id === id)
+  return filteredUsers[0]
+}
 
 module.exports = {
   removeAll,
   createUser,
   getUsers,
-  getUser,
+  getUserByEmail,
+  getUserById,
   removeUser
   // logUser
 }
