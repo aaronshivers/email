@@ -9,7 +9,6 @@ const file = NODE_ENV === 'test' ? './data/test-data.json' : './data/users-data.
 const getUsers = () => {
   try {
     const usersString = fs.readFileSync(file)
-  // console.log(JSON.parse(usersString))
     return JSON.parse(usersString)
   } catch (e) {
     return []
@@ -64,5 +63,4 @@ module.exports = {
   getUserByEmail,
   getUserById,
   removeUser
-  // logUser
 }
