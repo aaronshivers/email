@@ -42,22 +42,22 @@ curl -d '{"email":"myemail@someserver.com", "message":"this is a test"}' -H "Con
 ### Users Routes
 1. POST /users
 ```
-curl -d '{ "email": "user@server.com", "name": "user name" }' -H "Content-Type: application/json" -X POST localhost:8080/users
+curl -d '{ "email": "user@server.com", "name": "user name" }' -H "Content-Type: application/json" -X POST localhost:49160/users
 ```
 
 2. GET /users
 ```
-curl localhost:8080/users
+curl localhost:49160/users
 ```
 
 3. PUT /users:id
 ```
-curl -d '{ "email": "update@email.com", "name": "edited user" }' -H "Content-Type: application/json" -X PUT localhost:8080/users/31af1e83-f4a8-4171-8626-35a93c13ae2c
+curl -d '{ "email": "update@email.com", "name": "edited user" }' -H "Content-Type: application/json" -X PUT localhost:49160/users/31af1e83-f4a8-4171-8626-35a93c13ae2c
 ```
 
 4. DELETE /users:id
 ```
-curl -X DELETE localhost:8080/users/95c47c4e-e1be-4a4e-9c98-56a2278aef23
+curl -X DELETE localhost:49160/users/95c47c4e-e1be-4a4e-9c98-56a2278aef23
 ```
 
 ### Test Application
