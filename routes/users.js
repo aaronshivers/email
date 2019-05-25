@@ -9,35 +9,36 @@ const userValidator = require('../middleware/userValidator')
 const users = require('../middleware/users')
 
 // POST /users
-router.post('/users', validate(userValidator), (req, res) => {
+router.post('/users', validate(userValidator), async (req, res) => {
 
   try {
 
-    // get email and name from the body
-    const { email, name } = req.body
+    // get email and password from the body
+    const { email, password } = req.body
 
-    // check for existing user
-    const existingUser = users.getUserByEmail(email)
-    if (existingUser) return res.status(400).send(`User Already Exists`)
+    // check db for existing user
+    const existingUser = await User.findOne({ email })
+    if (existingUser) return res.status(400).render('error', { msg: 'User already registered.' })
 
-    // generate user id
-    const id = uuidv4()
+    // create user
+    const user = await new User({ email, password })
 
-    // create and save user
-    users.createUser({ id, email, name })
+    // save user
+    await user.save()
 
-    // send welcome email
-    if (process.env.NODE_ENV !== 'test') {
-      sendWelcomeEmail(email, name)
-    }
+    // get auth token
+    const token = await user.createAuthToken()
 
-    // return email and name
-    res.status(201).send({ id, email, name })
+    // set cookie options
+    const cookieOptions = { expires: new Date(Date.now() + 86400000), httpOnly: true  }
+
+    // set header and return user info
+    res.cookie('token', token, cookieOptions).redirect(`/users/me`)
 
   } catch (error) {
 
     // send error message
-    res.send(error.message)
+    res.render('error', { msg: error.message })
 
   }
 })

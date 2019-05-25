@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const mongoose = require('./db/mongoose')
 const sendErrorEmail = require('./emails/error')
 
 const userRoutes = require('./routes/users')
