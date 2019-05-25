@@ -41,3 +41,26 @@ curl -d '{"email":"myemail@someserver.com", "message":"this is a test"}' -H "Con
 2. GET /users
 3. PUT /users:id
 4. DELETE /users:id
+
+### Test Application
+
+1. Exit the dockerized application, if running.
+
+2. In the command line, from the root project directory
+
+  + To run the tests once
+
+  ```
+  npm run test
+  ```
+
+  + To run the tests once, then again on each file change
+
+  ```
+  npm run test-watch
+  ```
+
+  + Start the application in Development Mode
+  ```
+  npm start
+  ```
