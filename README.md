@@ -60,7 +60,7 @@ curl -d '{"email":"myemail@someserver.com", "message":"this is a test"}' -H "Con
   npm run test-watch
   ```
 
-  + Start the application in Development Mode
+  + Start the application in Development Mode without tests
   ```
   npm start
   ```
