@@ -112,5 +112,17 @@ describe('/users', () => {
         .set('Authorization', `Bearer ${ userOne.tokens[0].token }`)
         .expect(401)
     })
+
+    it('should get all users if user is admin', async () => {
+
+      await request(app)
+        .get('/users')
+        .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+        .expect(200)
+        .expect((res) => {
+          expect(res.text).toContain(userZero.email)
+          expect(res.text).toContain(userOne.email)
+        })
+    })
   })
 })

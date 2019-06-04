@@ -41,15 +41,32 @@ router.post('/users', validate(userValidator), async (req, res) => {
 })
 
 // GET /users
-router.get('/users', auth, (req, res) => {
+router.get('/users', auth, async (req, res) => {
 
   try {
 
     // verify isAdmin === true
     if (!req.user.isAdmin) return res.status(401).send('Access Denied! Admin Only!')
 
-    // return user list
-    res.send('req.user')
+    // find users
+    const users = await User.find()
+
+    // create usersList
+    const usersList = []
+
+    // add users to userList
+    for (const user of users) {
+      usersList.push({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        createdAt: user.createdAt
+      })
+    }
+
+    // return users
+    res.send(usersList)
 
   } catch (error) {
 
