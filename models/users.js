@@ -11,7 +11,15 @@ const userSchema = new Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    minlength: 8,
+    minlength: 5,
+    maxlength: 100
+  },
+  name: {
+    type: String,
+    required: true,
+    lowercase: true,
+    trim: true,
+    minlength: 2,
     maxlength: 100
   },
   password: {
@@ -30,7 +38,13 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
     required: true
-  }
+  },
+  tokens: [{
+    token: {
+      type: String,
+      required: true
+    }
+  }]
 })
 
 // hash plain text passwords
@@ -50,12 +64,16 @@ userSchema.pre('save', async function(next) {
 })
 
 // create authentication token
-userSchema.methods.createAuthToken = function () {
+userSchema.methods.createAuthToken = async function () {
   const user = this
   const payload = { _id: user._id, isAdmin: user.isAdmin }
   const secret = process.env.JWT_SECRET
-  const options = { expiresIn: '2d' }
-  return jwt.sign(payload, secret, options)
+  const token = jwt.sign(payload, secret)
+
+  user.tokens = user.tokens.concat({ token })
+  await user.save()
+  
+  return token
 }
 
 const User = mongoose.model('User', userSchema)

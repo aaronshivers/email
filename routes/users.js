@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const uuidv4 = require('uuid/v4')
 
 const { sendWelcomeEmail, sendGoodbyeEmail } = require('../emails/account')
 
+const User = require('../models/users')
+const auth = require('../middleware/auth')
 const validate = require('../middleware/validate')
 const userValidator = require('../middleware/userValidator')
-const users = require('../middleware/users')
 
 // POST /users
 router.post('/users', validate(userValidator), async (req, res) => {
@@ -14,14 +14,14 @@ router.post('/users', validate(userValidator), async (req, res) => {
   try {
 
     // get email and password from the body
-    const { email, password } = req.body
+    const { email, name, password } = req.body
 
     // check db for existing user
     const existingUser = await User.findOne({ email })
-    if (existingUser) return res.status(400).render('error', { msg: 'User already registered.' })
+    if (existingUser) return res.status(400).send('User already registered.')
 
     // create user
-    const user = await new User({ email, password })
+    const user = await new User({ email, name, password })
 
     // save user
     await user.save()
@@ -29,30 +29,27 @@ router.post('/users', validate(userValidator), async (req, res) => {
     // get auth token
     const token = await user.createAuthToken()
 
-    // set cookie options
-    const cookieOptions = { expires: new Date(Date.now() + 86400000), httpOnly: true  }
-
-    // set header and return user info
-    res.cookie('token', token, cookieOptions).redirect(`/users/me`)
+    // set return user info
+    res.send({ user, token })
 
   } catch (error) {
 
     // send error message
-    res.render('error', { msg: error.message })
+    res.send(error.message)
 
   }
 })
 
 // GET /users
-router.get('/users', (req, res) => {
+router.get('/users', auth, (req, res) => {
 
   try {
 
-    // get all users
-    const userList = users.getUsers()
+    // verify isAdmin === true
+    if (!req.user.isAdmin) return res.status(401).send('Access Denied! Admin Only!')
 
     // return user list
-    res.send(userList)
+    res.send('req.user')
 
   } catch (error) {
 
