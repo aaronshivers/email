@@ -125,4 +125,45 @@ describe('/users', () => {
         })
     })
   })
+
+  // DELETE /users/:id
+  describe('DELETE /users/:id', () => {
+
+    it('should respond 401 if user is NOT an admin', async () => {
+
+      await request(app)
+        .delete(`/users/${ userOneId }`)
+        .set('Authorization', `Bearer ${ userOne.tokens[0].token }`)
+        .expect(401)
+
+      const users = await User.find()
+      expect(users.length).toBe(2)
+    })
+
+    it('should return 400 if Id is invalid', async () => {
+
+      request(app)
+        .delete(`/users/1234`)
+        .expect(400)
+    })
+
+    it('should return 404 if the specified user is not found', async () => {
+
+      request(app)
+        .delete(`/users/${ new ObjectId() }`)
+        .expect(404)
+    })
+
+    it('should delete the user', async () => {
+
+      await request(app)
+        .delete(`/users/${ userOneId }`)
+        .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+        .expect(200)
+
+      const users = await User.find()
+      expect(users.length).toBe(1)
+      expect(users.toString()).toContain(userZeroId)
+    })
+  })
 })

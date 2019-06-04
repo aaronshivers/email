@@ -76,27 +76,26 @@ router.get('/users', auth, async (req, res) => {
 })
 
 // DELETE /users
-router.delete('/users/:id', (req, res) => {
+router.delete('/users/:id', auth, async (req, res) => {
 
   try {
 
-    // get user id from params
-    const { id } = req.params
+    // verify isAdmin === true
+    if (!req.user.isAdmin) return res.status(401).send('Access Denied! Admin Only!')
 
-    // verify that user is in the user list
-    const foundUser = users.getUserById(id)
-    if (!foundUser) return res.send('User Not Found')
+    // find and delete the user
+    const deletedUser = await User.findByIdAndDelete(req.params.id)
 
-    // delete the user
-    users.removeUser(id)
+    // reject if user was not found
+    if (!deletedUser) return res.status(404).render('User Not Found')
 
     // send goodby email
     if (process.env.NODE_ENV !== 'test') {
-      sendGoodbyeEmail(foundUser.email, foundUser.name)
+      sendGoodbyeEmail(deletedUser.email, deletedUser.name)
     }
 
     // return deleted user
-    res.send(foundUser)
+    res.send(deletedUser)
 
   } catch (error) {
     
