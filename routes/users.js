@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const bcrypt = require('bcrypt')
 
 const { sendWelcomeEmail, sendGoodbyeEmail } = require('../emails/account')
 
@@ -104,40 +105,48 @@ router.delete('/users/:id', auth, async (req, res) => {
   }
 })
 
-// PUT /users
-router.put('/users/:id', validate(userValidator), (req, res) => {
-  
+// PATCH /users/:id
+router.patch('/users/:id', [auth, validate(userValidator)], async (req, res) => {
+
   try {
 
-    // verify that req.params.id is in the users list
-    const oldUser = users.getUserById(req.params.id)
-    if (!oldUser) return res.status(400).send(`User Id Not Found`)
+    // verify isAdmin === true
+    if (!req.user.isAdmin) return res.status(401).send('Access Denied! Admin Only!')
 
-    // get email and name from the body
-    const { email, name } = req.body
+    // verify that the user exists in the DB
+    const userToEdit = await User.findById(req.params.id)
+    if (!userToEdit) return res.status(404).send('User Not Found')
 
-    // check for existing user
-    const existingUser = users.getUserByEmail(email)
-    if (existingUser) return res.status(400).send(`User Already Exists`)
+    // get email and password
+    const { email, password, name } = req.body
 
-    // delete old user
-    const deletedUser = users.removeUser(req.params.id)
-    if (!deletedUser) return res.status(500).send(`User Could Not Be Updated`)
+    // hash password
+    const saltRounds = 10
+    const hash = await bcrypt.hash(password, saltRounds)
 
-    // generate new id
-    const id = uuidv4()
+    // check for duplicate user
+    const duplicateUser = await User.findOne({ email })
 
-    // create and save user
-    const newUser = users.createUser({ id, email, name })
+    // reject if duplicate user
+    if (duplicateUser) return res.status(400).send('Email Already In Use')
 
-    // return email and name
-    res.status(200).send(newUser)
+    // set updates and options
+    const updates = { email, password: hash, name }
+    const options = { new: true, runValidators: true }
+
+    // update user
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, updates, options)
+
+    // respond 500 if user was not updated
+    if (!updatedUser) return res.status(500).send('User Not Updated')
+
+    // send updated user info
+    res.send(updatedUser)
 
   } catch (error) {
 
     // send error message
     res.send(error.message)
-
   }
 })
 
