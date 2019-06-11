@@ -17,7 +17,7 @@ options = {
   retryWrites: true,
   user: MONGO_USER,
   pass: MONGO_PASS,
-  dbName: 'test'
+  dbName: NODE_ENV
 }
 
 mongoose.connect(encodedUri, options)

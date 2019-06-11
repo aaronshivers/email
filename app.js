@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('./db/mongoose')
 const sendErrorEmail = require('./emails/error')
+const User = require('./models/users')
 
 const userRoutes = require('./routes/users')
 
@@ -20,14 +21,47 @@ app.get('/', (req, res) => res.send('howdy'))
 app.post('/', (req, res) => {
 
   // get email address and message from body
-  const { email, message } = req.body
+  const { email, message, fields } = req.body
 
   // send message email
   if (process.env.NODE_ENV !== 'test') {
-    sendErrorEmail(email, message)
+    sendErrorEmail(email, message, fields)
   }
 
-  res.send({ email, message })
+  res.send({ email, message, fields })
+})
+
+// POST /all
+app.post('/all', async (req, res) => {
+
+  try {
+
+    // send message email
+    if (process.env.NODE_ENV !== 'test') {
+
+      // find users
+      const users = await User.find()
+
+      const emails = users.map(user => user.email)
+  // console.log(emails)
+
+      const { message, field } = req.body
+
+      // send email to all users
+      emails.forEach(email => sendErrorEmail(email, message, field))
+
+      // respond with users list
+      res.send(`Emails sent to the following users - ${ emails }`)
+    }
+
+    res.send(`Server In Test Mode. No Emails Sent.`)
+
+  } catch(error) {
+
+    res.send(error.message)
+  }
+
+
 })
 
 app.listen(PORT, HOST)
