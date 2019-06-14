@@ -18,47 +18,112 @@ describe('/', () => {
 
   describe('POST /', () => {
 
-    it('should recieve an email address error message, and container', async () => {
-
-      const data = { email: 'test@example.com', message: 'test message', fields: 'container 1' }
-
-      await request(app)
-        .post('/')
-        .send(data)
-        .expect(200)
-        .expect(res => {
-          expect(res.body.email).toContain(data.email)
-          expect(res.body.message).toContain(data.message)
-          expect(res.body.fields).toContain(data.fields)
-        })
-    })
-  })
-
-  describe('POST /all', () => {
-
     describe('when no data is sent', () => {
 
       it('should respond 400', async () => {
 
         await request(app)
-          .post('/all')
+          .post('/')
           .expect(400)
       })
     })
 
     describe('when data is sent', () => {
 
-      describe('and the data is invalid', () => {
+      describe('and the email is invalid', () => {
+
+        const data = { email: 1234, message: 'test message', fields: 'container 1' }
 
         it('should respond 400', async () => {
 
           await request(app)
-            .post('/all')
+            .post('/')
+            .send(data)
+            .expect(400)
+        })
+      })
+    
+      describe('and the message is invalid', () => {
+
+        const data = { email: 'test@example.com', message: 1234, fields: 'container 1' }
+
+        it('should respond 400', async () => {
+
+          await request(app)
+            .post('/')
+            .send(data)
+            .expect(400)
+        })
+      })
+    
+      describe('and fields is invalid', () => {
+
+        const data = { email: 'test@example.com', message: 'test message', fields: 1234 }
+
+        it('should respond 400', async () => {
+
+          await request(app)
+            .post('/')
+            .send(data)
             .expect(400)
         })
       })
     
       describe('and the data is valid', () => {
+
+        const data = { email: 'test@example.com', message: 'test message', fields: 'container 1' }
+
+        it('should respond 200', async () => {
+  
+          await request(app)
+            .post('/')
+            .send(data)
+            .expect(200)
+        })
+
+        it('should return the data', async () => {
+
+          await request(app)
+            .post('/')
+            .send(data)
+            .expect(res => {
+              expect(res.body).toEqual(data)
+            })
+        })
+      })
+    })
+  })
+
+  describe('POST /all', () => {
+
+    beforeEach(async () => {
+
+      await User.deleteMany()
+
+      const user = {
+        name: 'Bob',
+        email: 'bob@test.net',
+        password: 'asdfASDF1234!@#$'
+      }
+
+      await new User(user).save()
+    })
+
+    describe('when no users are found', () => {
+
+      it('should respond 500', async () => {
+
+        await User.deleteMany()
+
+        await request(app)
+          .post('/all')
+          .expect(500)
+      })
+    })
+
+    describe('when users are found', () => {
+
+      describe('and the server is in test mode', () => {
 
         it('should respond 200', async () => {
 
@@ -67,14 +132,39 @@ describe('/', () => {
             .expect(200)
         })
 
-        it('should return a list of all users', async () => {
+        it('should return a list of user email addresses', async () => {
 
-          const users = User.find()
+          const users = await User.find()
+          const emailList = users.map(user => user.email)
 
           await request(app)
-            .post('all')
+            .post('/all')
             .expect(res => {
-              expect(res.body).toBe(users)
+              expect(res.text).toContain(JSON.stringify(emailList))
+            })
+        })
+      })
+    
+      describe('and the server is not in test mode', () => {
+
+        it('should respond 200', async () => {
+
+          await request(app)
+            .post('/all')
+            .expect(200)
+        })
+
+        it('should send an email to all users', () => {})
+
+        it('should return a list of user email addresses', async () => {
+
+          const users = await User.find()
+          const emailList = users.map(user => user.email)
+
+          await request(app)
+            .post('/all')
+            .expect(res => {
+              expect(res.text).toContain(JSON.stringify(emailList))
             })
         })
       })

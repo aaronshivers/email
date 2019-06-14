@@ -19,9 +19,10 @@
     "supertest": "^4.0.2"
   },
   "scripts": {
-    "start": "export NODE_ENV=development && node app.js",
+    "start": "export NODE_ENV=test || SET \"NODE_ENV=development\" && node app.js",
+    "dev": "export NODE_ENV=test || SET \"NODE_ENV=development\" && nodemon",
     "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha -t 5000 tests/**/*.test.js",
-    "test-watch": "nodemon --exec \"npm test\""
+    "test-watch": "export NODE_ENV=test || SET \"NODE_ENV=test\" && nodemon --exec \"npm test\""
   },
   "nodemonConfig": {
     "ignore": [
