@@ -36,10 +36,48 @@ describe('/', () => {
 
   describe('POST /all', () => {
 
-    it('should send an email to all users', async () => {
+    describe('when no data is sent', () => {
 
-      const users = User.find()
-      // console.log(users)
+      it('should respond 400', async () => {
+
+        await request(app)
+          .post('/all')
+          .expect(400)
+      })
+    })
+
+    describe('when data is sent', () => {
+
+      describe('and the data is invalid', () => {
+
+        it('should respond 400', async () => {
+
+          await request(app)
+            .post('/all')
+            .expect(400)
+        })
+      })
+    
+      describe('and the data is valid', () => {
+
+        it('should respond 200', async () => {
+
+          await request(app)
+            .post('/all')
+            .expect(200)
+        })
+
+        it('should return a list of all users', async () => {
+
+          const users = User.find()
+
+          await request(app)
+            .post('all')
+            .expect(res => {
+              expect(res.body).toBe(users)
+            })
+        })
+      })
     })
   })
 })
