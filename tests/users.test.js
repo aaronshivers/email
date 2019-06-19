@@ -337,149 +337,183 @@ describe('/users', () => {
               .expect(404)
           })   
         })
+
+        describe('and `ObjectId` is in the DB', () => {
+
+          describe('and some data is invalid', () => {
+
+            describe('`email` is invalid', () => {
+
+              const update = {
+                email: 12341234,
+                password: 'asdfASDF1234!@#$',
+                name: 'updated user'
+              }
+
+              it('should respond 400', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(400)
+              })
+
+              it('should NOT update `user`', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+
+                const foundUser = await User.findById(userOneId)
+                expect(foundUser._id).toEqual(userOneId)
+                expect(foundUser.name).toEqual(userOne.name)
+                expect(foundUser.email).not.toEqual(update.email)
+              })
+            })
+
+            describe('`password` is invalid', () => {
+
+              const update = {
+                email: 'user@example.net',
+                password: 'asdf',
+                name: 'updated user'
+              }
+
+              it('should respond 400', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(400)
+              })
+
+              it('should NOT update a user with an invalid password', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+
+                const foundUser = await User.findById(userOneId)
+                expect(foundUser._id).toEqual(userOneId)
+                expect(foundUser.name).toEqual(userOne.name)
+                expect(foundUser.email).not.toEqual(update.email)
+              })
+            })
+
+            describe('`name` is invaild', () => {
+
+              const update = {
+                email: 'user@example.net',
+                password: 'asfdASDF1234!@#$',
+                name: 'a'
+              }
+
+              it('should respond 400', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(400)
+              })
+
+              it('should NOT update a user with an invalid name', async () => {
+                
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+
+                const foundUser = await User.findById(userOneId)
+                expect(foundUser._id).toEqual(userOneId)
+                expect(foundUser.name).toEqual(userOne.name)
+                expect(foundUser.email).not.toEqual(update.email)
+              })
+            })
+          })
+
+          describe('and all data is valid', () => {
+
+            describe('and `email` is in use by another user', () => {
+
+              it('should respond 400', async () => {
+                
+                const update = userZero
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(400)
+              })
+
+              it('should NOT update a user', async () => {
+                
+                const update = userZero
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+
+                const foundUser = await User.findById(userOneId)
+                expect(foundUser._id).toEqual(userOneId)
+                expect(foundUser.name).toEqual(userOne.name)
+                expect(foundUser.email).not.toEqual(update.email)
+              })
+            })
+
+            describe('and `email` is not in use by another user', () => {
+
+              const update = {
+                email: 'user@example.net',
+                password: 'asdfASDF1234!@#$',
+                name: 'updated user'
+              }
+
+              it('should respond 200', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(200)
+              })
+
+              it('should respond with the updated user info', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+                  .expect(res => {
+                    expect(res.text).toContain(update.email)
+                    expect(res.text).toContain(update.name)
+                  })
+              })
+
+              it('should save the updated user', async () => {
+
+                await request(app)
+                  .patch(`/users/${ userOneId }`)
+                  .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
+                  .send(update)
+
+                  const foundUser = await User.findById(userOneId)
+                  expect(foundUser).toBeTruthy()
+                  expect(foundUser._id).toEqual(userOneId)
+                  expect(foundUser.email).toEqual(update.email)
+                  expect(foundUser.name).toEqual(update.name)
+                  expect(foundUser.password).not.toEqual(update.password)
+              })
+            })
+          })
+        })
       })
-
-      describe('and `ObjectId` is in the DB', () => {
-
-        describe('and `email` is invalid', () => {
-
-            const update = {
-              email: 12341234,
-              password: 'asdfASDF1234!@#$',
-              name: 'updated user'
-            }
-
-          it('should respond 400', async () => {
-
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-              .expect(400)
-          })
-
-          it('should NOT update `user`', async () => {
-
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-
-            const foundUser = await User.findById(userOneId)
-            expect(foundUser._id).toEqual(userOneId)
-            expect(foundUser.name).toEqual(userOne.name)
-            expect(foundUser.email).not.toEqual(update.email)
-          })
-        })
-
-        describe('and `password` is invalid', () => {
-
-          const update = {
-            email: 'user@example.net',
-            password: 'asdf',
-            name: 'updated user'
-          }
-
-          it('should respond 400', async () => {
-
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-              .expect(400)
-          })
-
-          it('should NOT update a user with an invalid password', async () => {
-
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-
-            const foundUser = await User.findById(userOneId)
-            expect(foundUser._id).toEqual(userOneId)
-            expect(foundUser.name).toEqual(userOne.name)
-            expect(foundUser.email).not.toEqual(update.email)
-          })
-        })
-
-        describe('and `name` is invaild', () => {
-
-          const update = {
-            email: 'user@example.net',
-            password: 'asfdASDF1234!@#$',
-            name: 'a'
-          }
-
-          it('should respond 400', async () => {
-
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-              .expect(400)
-          })
-
-          it('should NOT update a user with an invalid name', async () => {
-            
-            await request(app)
-              .patch(`/users/${ userOneId }`)
-              .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-              .send(update)
-
-            const foundUser = await User.findById(userOneId)
-            expect(foundUser._id).toEqual(userOneId)
-            expect(foundUser.name).toEqual(userOne.name)
-            expect(foundUser.email).not.toEqual(update.email)
-          })
-        })
-      })
-    })
-
-
-
-
-
-    it('should NOT update a user if the email is in use by another user', async () => {
-      
-      const update = userZero
-
-      await request(app)
-        .patch(`/users/${ userOneId }`)
-        .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-        .send(update)
-        .expect(400)
-
-      const foundUser = await User.findById(userOneId)
-      expect(foundUser._id).toEqual(userOneId)
-      expect(foundUser.name).toEqual(userOne.name)
-      expect(foundUser.email).not.toEqual(update.email)
-    })
-
-    it('should respond 302, save the updated user, and redirect to /users/profile if user is Admin', async () => {
-
-      const update = {
-        email: 'user@example.net',
-        password: 'asdfASDF1234!@#$',
-        name: 'updated user'
-      }
-
-      await request(app)
-        .patch(`/users/${ userOneId }`)
-        .set('Authorization', `Bearer ${ userZero.tokens[0].token }`)
-        .send(update)
-        .expect(200)
-        .expect(res => {
-          expect(res.text).toContain(update.email)
-          expect(res.text).toContain(update.name)
-        })
-
-        const foundUser = await User.findById(userOneId)
-        expect(foundUser).toBeTruthy()
-        expect(foundUser._id).toEqual(userOneId)
-        expect(foundUser.email).toEqual(update.email)
-        expect(foundUser.name).toEqual(update.name)
-        expect(foundUser.password).not.toEqual(update.password)
     })
   })
 })
